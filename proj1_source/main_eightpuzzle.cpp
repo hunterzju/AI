@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 	EightPuzzleState iniState;
-	generateState(&iniState,50); // randomly generate a initial state, the second variable indicates how
+	generateState(&iniState,10); // randomly generate a initial state, the second variable indicates how
 								// far the initial state is from final state, for debugging, choose 10.
 								// For testing, you may choose 50 - 150.
 	vector<int> moves;

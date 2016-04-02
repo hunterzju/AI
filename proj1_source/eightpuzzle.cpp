@@ -40,11 +40,13 @@ void AStarSearchFor8Puzzle(EightPuzzleState& iniState, vector<int>& moves)
     state = openlist.top(); return a node with smallest g + h
     operations of closelist
     closelist.push_back(state); push a node into closelist*/
-    priority_queue<EightPuzzleState*, vector<EightPuzzleState*>, cmpLarge> temp_openlist;
+    //priority_queue<EightPuzzleState*, vector<EightPuzzleState*>, cmpLarge> temp_openlist;
     EightPuzzleState* current;
     EightPuzzleState* sonState;
     int command;
+	int g_temp = 0;
     
+	sonState = (EightPuzzleState*)malloc(sizeof(EightPuzzleState));
     
     openlist.push(&iniState);
     
@@ -52,20 +54,29 @@ void AStarSearchFor8Puzzle(EightPuzzleState& iniState, vector<int>& moves)
     {
         current = openlist.top();
         if(checkFinalState(current))
-            return reconstructPath(current, &iniState);
+            return reconstructPath(current, &iniState, moves);
         openlist.pop();
         closelist.push_back(current);
         for(command=0;command<4;command++)
         {
             if(runOneMove(current, sonState, command))
             {
-                sonState->g += 1;
-                if(checkCloseList(sonState))
-                continue;
-                else if(checkOpenList(sonState,openlist))
-                continue;
+				g_temp++;
+				//sonState->g = g_temp;
+                if(checkCloseList(sonState, closelist))
+					continue;
+				else if (!checkOpenList(sonState, openlist))
+					openlist.push(sonState);
 				else
-				; 
+					if (current->g + 1 >= sonState->g)
+						continue;
+					else
+					{
+						sonState->g = g_temp;
+						sonState->h = h_caculation(sonState);
+						sonState->preMove = command;
+						sonState->preState = current;
+					}
             }
         }
      }
@@ -277,12 +288,56 @@ int h_caculation(EightPuzzleState* preState)
     return h;
 }
 
-bool checkCloseList(EightPuzzleState* nextState)
+/*
+if nextState in closelist return TRUE
+else return FALSE
+*/
+bool checkCloseList(EightPuzzleState* nextState,vector<EightPuzzleState*> closelist)
 {
-    
+    int length,j;
+	length = closelist.size();
+	for(j=0;j<length;j++)
+	{
+		if(nextState == closelist[j])
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
+/*
+if nextState in closelist return TRUE
+else return FALSE
+*/
 bool checkOpenList(EightPuzzleState* nextState,priority_queue<EightPuzzleState*, vector<EightPuzzleState*>, cmpLarge> openlist)
 {
-    
+	priority_queue<EightPuzzleState*, vector<EightPuzzleState*>, cmpLarge> temp_openlist;
+	EightPuzzleState* pState;
+	temp_openlist = openlist;
+	while (!temp_openlist.empty())
+	{
+		pState = temp_openlist.top();
+		if (pState == nextState)
+			return true;
+	}
+	return false;
+}
+
+void reconstructPath(EightPuzzleState* current, EightPuzzleState* iniState, vector<int>& moves)
+{
+	vector<int> temp_moves;
+	int i, j, steps;
+	i = 0; 
+	steps = 0;
+	while (current->preState != iniState)
+	{
+		temp_moves[i] = current->preMove;
+		i++;
+	}
+	steps = temp_moves.size();
+	for (j = 0; j < steps; j++)
+	{
+		moves[j] = temp_moves[steps-j-1];
+	}
 }

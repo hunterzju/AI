@@ -128,10 +128,10 @@ void printState(EightPuzzleState* state);
 */
 int h_caculation(EightPuzzleState* preState);
 
-bool checkCloseList(EightPuzzleState* nextState);
+bool checkCloseList(EightPuzzleState* nextState,vector<EightPuzzleState*> closelist);
 
 bool checkOpenList(EightPuzzleState* nextState,priority_queue<EightPuzzleState*, vector<EightPuzzleState*>, cmpLarge> openlist);
 
-void reconstructPath(EightPuzzleState* current, EightPuzzleState* iniState);
+void reconstructPath(EightPuzzleState* current, EightPuzzleState* iniState, vector<int>& moves);
 
 #endif
